@@ -31,14 +31,9 @@ RUN  cd /opt/maltrail/trails/feeds \
 
 WORKDIR /opt/maltrail
 
-RUN cd /opt/maltrail \
-#   && pip install -r requirements.txt
-
 EXPOSE 8338
 
-ENTRYPOINT  ["python", "/root/server.py"]
-
-WORKDIR /opt/maltrail/
+#ENTRYPOINT  ["python", "/opt/server.py"]
 
 # Start maltrail server
 CMD [ "python", "./server.py" ]
