@@ -32,7 +32,7 @@ RUN  cd /opt/maltrail/trails/feeds \
 WORKDIR /opt/maltrail
 
 RUN cd /opt/maltrail \
-   && pip install -r requirements.txt
+#   && pip install -r requirements.txt
 
 EXPOSE 8338
 
