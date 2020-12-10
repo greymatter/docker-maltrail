@@ -1,4 +1,4 @@
-ROM alpine:3.7
+FROM alpine:3.7
 
 LABEL maintainer="Todd Smetanka <s4biturbo@gmail.com>"
 
