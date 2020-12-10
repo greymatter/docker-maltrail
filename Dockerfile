@@ -1,14 +1,44 @@
-FROM debian:jessie
+ROM alpine:3.7
 
-RUN apt-get update \ 
-    && apt-get upgrade -y \
-    && apt-get install -y python-pcapy git curl schedtool \
-    && git clone https://github.com/stamparm/maltrail.git /opt/maltrail \
-    && python /opt/maltrail/core/update.py
+LABEL maintainer="Todd Smetanka <s4biturbo@gmail.com>"
+
+# Install packages and python dependencies
+# Install dev dependencies
+# Download source code and install it
+# Cleanup directories
+# hadolint ignore=DL3018
+RUN apk -U upgrade && apk --no-cache add \
+    curl \
+    bash \
+    python \
+    libstdc++ \
+    libpcap \
+ && apk --update add --virtual build-dependencies \
+    git \
+    build-base \
+    py-pip \
+    libpcap-dev \
+    python-dev \
+ && pip install --disable-pip-version-check pcapy==0.11.3 \
+ && git clone https://github.com/stamparm/maltrail.git /opt/maltrail \
+ && apk del build-dependencies \
+ && rm -fr /root/.cache
+
+RUN  cd /opt/maltrail/trails/feeds \
+  && curl https://raw.githubusercontent.com/carlospolop/MaltrailWorld/master/trails/feeds/malwareworld_domains.py --output malwareworld_domains.py \
+  && curl https://raw.githubusercontent.com/carlospolop/MaltrailWorld/master/trails/feeds/malwareworld_ips.py --output malwareworld_ips.py \
+   && python /opt/maltrail/core/update.py
 
 WORKDIR /opt/maltrail
 
-COPY docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
-RUN ln -s /usr/local/bin/docker-entrypoint.sh /
+RUN cd /opt/maltrail \
+   && pip install -r requirements.txt
 
-ENTRYPOINT ["/bin/bash", "/docker-entrypoint.sh"]
+EXPOSE 8338
+
+ENTRYPOINT  ["python", "/root/server.py"]
+
+WORKDIR /opt/maltrail/
+
+# Start maltrail server
+CMD [ "python", "./server.py" ]
